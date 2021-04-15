@@ -1,0 +1,28 @@
+{
+	"name" : "xubin/idnoise",
+	"description" : "对一个具有系列规律的ID数字进行干扰使其看上去不再规律，并能反向恢复之。",
+	"type" : "library",
+	"version" : "0.1.1",
+	"license" : "MIT",
+	"minimum-stability" : "dev",
+	"authors" : [{
+			"name" : "xubin",
+			"email" : "xubin727@163.com",
+			"role" : "PHP码农"
+		}
+	],
+	"require" : {
+		"php" : ">=5.6"
+	},
+	"require-dev" : {
+		"php" : ">=5.6"
+	},
+	"suggest" : {
+		"php" : ">=7.0"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"Xubin\\IDNoise\\" : "./src/"
+		}
+	}
+}
