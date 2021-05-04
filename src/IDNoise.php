@@ -1,6 +1,8 @@
 <?php
 namespace Xubin\IDNoise;
 
+use Google\CRC32\CRC32;
+
 class IDNoise {
     
     /**
@@ -35,17 +37,19 @@ class IDNoise {
     /**
      * 对数字进行干扰编码
      * @param number $number
+     * @param string $secret
      * @return string
      */
-    public static function encode($number)
+    public static function encode($number, $secret='')
     {
         $len = strlen($number);
         $last = substr($number, -1);
         $suff = 99 - ( $len+$last);
+        $crcLastChar = self::_crcLastChar($number, $secret);
         
         $numberAry = str_split($number);
         
-        $rtStr = $suff . $last . $len;
+        $rtStr = $suff . $last . $len . $crcLastChar;
         for ($n=0; $n<=max(9, $len-1); $n++) {
             $dict = self::$dictionary[$last];
             if (isset($numberAry[$n])) {
@@ -63,15 +67,19 @@ class IDNoise {
     
     /**
      * 对一个已干扰数字进行解码
-     * @param string|number $string
+     * @param string $string
+     * @param string $secret
      * @return number
      */
-    public static function decode($string)
+    public static function decode($string, $secret='')
     {
         $suff = substr($string, 0, 2);
         $last = substr($string, 2, 1);
         $len = 99 - $last - $suff;
         $start = $suff . $last . $len;
+        
+        $crcLastChar = substr($string, strlen($start), 1);
+        $start .= $crcLastChar;
         
         $rtStr = '';
         $i = strlen($start);
@@ -80,8 +88,27 @@ class IDNoise {
             $rtStr .= $nStr;
             $i += strlen(self::$dictionary[$last][$nStr]) + 1;
         }
+//         var_dump($rtStr, self::_crcLastChar($rtStr, $secret), $crcLastChar);
+        if (self::_crcLastChar($rtStr, $secret) != $crcLastChar) {
+            exit; // 验证不通过的字符串ID是人造的，不可用，不输出任何信息直接退出
+        }
         
         return $rtStr;
+    }
+    
+    /**
+     * 返回CRC后的字符串的最后一个字符
+     * @param string $number
+     * @param string $secret
+     * @return string
+     */
+    protected static function _crcLastChar($number, $secret)
+    {
+        $crc = CRC32::create(CRC32::CASTAGNOLI);
+        $crc->update($number . $secret);
+        $crcLastChar = substr($crc->hash(), -1);
+        
+        return $crcLastChar;
     }
     
 }
