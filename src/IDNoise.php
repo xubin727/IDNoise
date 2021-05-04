@@ -49,7 +49,7 @@ class IDNoise {
         
         $numberAry = str_split($number);
         
-        $rtStr = $suff . $last . $len . $crcLastChar;
+        $rtStr = $crcLastChar . $suff . $last . $len;
         for ($n=0; $n<=max(9, $len-1); $n++) {
             $dict = self::$dictionary[$last];
             if (isset($numberAry[$n])) {
@@ -73,13 +73,11 @@ class IDNoise {
      */
     public static function decode($string, $secret='')
     {
-        $suff = substr($string, 0, 2);
-        $last = substr($string, 2, 1);
+        $crcLastChar = substr($string, 0, 1);
+        $suff = substr($string, 1, 2);
+        $last = substr($string, 3, 1);
         $len = 99 - $last - $suff;
-        $start = $suff . $last . $len;
-        
-        $crcLastChar = substr($string, strlen($start), 1);
-        $start .= $crcLastChar;
+        $start = $crcLastChar . $suff . $last . $len;
         
         $rtStr = '';
         $i = strlen($start);
@@ -106,7 +104,7 @@ class IDNoise {
     {
         $crc = CRC32::create(CRC32::CASTAGNOLI);
         $crc->update($number . $secret);
-        $crcLastChar = substr($crc->hash(), -1);
+        $crcLastChar = strtoupper(substr($crc->hash(), -1));
         
         return $crcLastChar;
     }

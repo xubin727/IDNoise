@@ -2,7 +2,7 @@
 	"name" : "xubin/idnoise",
 	"description" : "对一个具有系列规律的ID数字进行干扰使其看上去不再规律，并能反向恢复之。",
 	"type" : "library",
-	"version" : "0.2.0",
+	"version" : "0.2.1",
 	"license" : "MIT",
 	"minimum-stability" : "dev",
 	"authors" : [{
